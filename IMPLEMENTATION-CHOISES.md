@@ -17,4 +17,6 @@ The service will be running on `http://localhost:4200`
 ### Env
 In the demo there's an env, with the nasa api key. We won't need an env, since the application we'll be creating will use a keyless api.
 
-+
+### Github pages
+I will use the Nest vps, with my own domain.
+I dockerized the app, since I like working with docker, and it makes things easier for me.

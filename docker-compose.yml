@@ -1,0 +1,17 @@
+services:
+  oscilla:
+    build:
+      context: .
+    image: oscilla:latest
+    container_name: oscilla
+    restart: unless-stopped
+    ports:
+      # I use an high port, so it doesn't mess up with my other projects in the nest vps
+      - "${21080}:8080"
+    security_opt:
+      - no-new-privileges:true
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
