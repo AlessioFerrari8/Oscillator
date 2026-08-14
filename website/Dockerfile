@@ -15,7 +15,7 @@ FROM nginxinc/nginx-unprivileged:stable-alpine AS runtime
 
 COPY docker/nginx/security.conf /etc/nginx/snippets/security.conf
 COPY docker/nginx/default.conf /etc/nginx/conf.d/default.conf
-COPY --from=build /app/dist/oscilla/browser /usr/share/nginx/html
+COPY --from=build /app/dist/website/browser /usr/share/nginx/html
 
 EXPOSE 8080
 
