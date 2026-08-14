@@ -8,7 +8,7 @@ waveform on a `<canvas>` fed by the **real data of the page** — open
 tasks, wind and rain from the weather, the clock, your keystrokes.
 That is the pulse, taken literally.
 
-Live: https://<oscilla.alessio.hackclub.app>     
+Live: https://oscilla.alessio.hackclub.app
 Repo: https://github.com/AlessioFerrari8/Oscillator
 
 
