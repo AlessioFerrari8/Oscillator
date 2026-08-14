@@ -1,0 +1,42 @@
+<main class="oscilla-shell">
+  <app-boot></app-boot>
+  <app-scope></app-scope>
+
+  <!-- The bar and the search live in the same front panel: they are the only
+       elements the wave can reach up top when the amplitude is at full. -->
+  <header class="console">
+    <div class="topbar">
+      <span class="topbar__status">sys online</span>
+      <span class="topbar__clock">{{ clock() }}</span>
+    </div>
+    <app-search />
+  </header>
+
+  <div class="grid">
+    @for (id of layout(); track id) {
+      <div class="grid__cell"
+           [class.grid__cell--dragging]="dragged() === id"
+           (dragover)="onDragOver($event)"
+           (drop)="onDrop($event, id)">
+        <button
+          type="button"
+          class="grid__grip"
+          draggable="true"
+          (dragstart)="onDragStart($event, id)"
+          (dragend)="onDragEnd()"
+          (keydown)="onGripKey($event, id)"
+          [attr.aria-label]="'move ' + id + ' panel, position ' + position(id) + ', use arrow keys'"
+          title="drag to reorder — or focus and use the arrow keys">⠿</button>
+
+        @switch (id) {
+          @case ('tasks') { <app-tasks></app-tasks> }
+          @case ('weather') { <app-weather></app-weather> }
+          @case ('links') { <app-links></app-links> }
+        }
+      </div>
+    }
+  </div>
+
+  <app-settings></app-settings>
+  <app-palette></app-palette>
+</main>
