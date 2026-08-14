@@ -1,0 +1,29 @@
+<form class="search" (ngSubmit)="submit()">
+  <label class="search__prompt" for="search-field">&gt;</label>
+  <input
+    id="search-field"
+    class="search__field"
+    type="text"
+    autocomplete="off"
+    spellcheck="false"
+    placeholder="search or type a command"
+    [(ngModel)]="text"
+    name="q"
+    (input)="onInput()"
+  />
+
+  @if (effective() !== engine()) {
+    <span class="search__override">&rarr; {{ effective() }}</span>
+  }
+
+  <select
+    class="search__engine"
+    aria-label="search engine"
+    [value]="engine()"
+    (change)="setEngine($any($event.target).value)"
+  >
+    @for (e of engines; track e) {
+      <option [value]="e">{{ e }}</option>
+    }
+  </select>
+</form>

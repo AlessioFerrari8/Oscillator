@@ -1,0 +1,41 @@
+<section class="panel">
+  <h2 class="panel__title">
+    links
+    <button type="button" class="links__edit" (click)="toggleEdit()">
+      {{ editing() ? 'done' : 'edit' }}
+    </button>
+  </h2>
+
+  <ul class="links__grid">
+    @for (l of items(); track l.id) {
+      <li class="links__cell">
+        <a class="links__link" [href]="l.url" (click)="open()">
+          <span class="links__icon">
+            @if (icon(l.url); as src) {
+              <img [src]="src" alt="" width="16" height="16" (error)="onIconError($event)" />
+            }
+            <span class="links__initial">{{ initial(l.label) }}</span>
+          </span>
+          <span class="links__label">{{ l.label }}</span>
+        </a>
+        @if (editing()) {
+          <button type="button" class="links__remove" (click)="remove(l.id)"
+                  [attr.aria-label]="'delete ' + l.label">×</button>
+        }
+      </li>
+    }
+  </ul>
+
+  @if (editing()) {
+    <form class="links__add" (ngSubmit)="add()">
+      <input class="links__field" type="text" placeholder="label"
+             [(ngModel)]="draftLabel" name="label" autocomplete="off" />
+      <input class="links__field" type="text" placeholder="url"
+             [(ngModel)]="draftUrl" name="url" autocomplete="off" />
+      <button type="submit" class="links__submit">add</button>
+    </form>
+    @if (error()) {
+      <p class="links__error">{{ error() }}</p>
+    }
+  }
+</section>

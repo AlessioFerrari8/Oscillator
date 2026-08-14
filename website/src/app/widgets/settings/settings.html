@@ -1,0 +1,57 @@
+<!-- Closed, it is not a panel, an empty bar as wide as the screen would cut
+     the wave in two, leaving only stumps of trace in the corners -->
+<section class="settings" [class.panel]="open()">
+  @if (open()) {
+    <h2 class="panel__title">
+      settings
+      <button type="button" class="settings__toggle" (click)="toggle()">close</button>
+    </h2>
+  } @else {
+    <button type="button" class="settings__toggle settings__toggle--shut" (click)="toggle()">
+      settings
+    </button>
+  }
+
+  @if (open()) {
+    <div class="settings__row">
+      <span class="settings__label">phosphor</span>
+      @for (a of accents; track a) {
+        <button type="button" class="settings__chip"
+                [class.settings__chip--on]="store.state().theme.accent === a"
+                (click)="setAccent(a)">{{ a }}</button>
+      }
+    </div>
+
+    <div class="settings__row">
+      <span class="settings__label">engine</span>
+      @for (e of engines; track e) {
+        <button type="button" class="settings__chip"
+                [class.settings__chip--on]="store.state().search.engine === e"
+                (click)="setEngine(e)">{{ e }}</button>
+      }
+    </div>
+
+    <form class="settings__row" (ngSubmit)="setCity(city.value, lat.value, lon.value)">
+      <span class="settings__label">location</span>
+      <input #city class="settings__field" type="text" placeholder="city" name="city" />
+      <input #lat class="settings__field" type="text" placeholder="lat" name="lat" />
+      <input #lon class="settings__field" type="text" placeholder="lon" name="lon" />
+      <button type="submit" class="settings__chip">save</button>
+    </form>
+
+    <div class="settings__row">
+      <span class="settings__label">backup</span>
+      <button type="button" class="settings__chip" (click)="copyExport()">export</button>
+    </div>
+
+    <form class="settings__row" (ngSubmit)="doImport()">
+      <textarea class="settings__area" placeholder="paste exported json"
+                [(ngModel)]="importText" name="importText" rows="3"></textarea>
+      <button type="submit" class="settings__chip">import</button>
+    </form>
+
+    @if (message()) {
+      <p class="settings__message">{{ message() }}</p>
+    }
+  }
+</section>

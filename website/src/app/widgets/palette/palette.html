@@ -1,0 +1,23 @@
+@if (open()) {
+  <div class="palette" role="dialog" aria-label="command palette" (click)="close()">
+    <div class="palette__box" (click)="$event.stopPropagation()">
+      <input
+        class="palette__field"
+        type="text"
+        autofocus
+        placeholder="run a command"
+        [(ngModel)]="filter"
+        name="filter"
+      />
+      <ul class="palette__list">
+        @for (c of visible(); track c.id) {
+          <li>
+            <button type="button" class="palette__item" (click)="run(c)">{{ c.label }}</button>
+          </li>
+        } @empty {
+          <li class="palette__empty">no match</li>
+        }
+      </ul>
+    </div>
+  </div>
+}

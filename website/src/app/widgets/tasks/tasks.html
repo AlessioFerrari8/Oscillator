@@ -1,0 +1,40 @@
+<section class="panel">
+  <h2 class="panel__title">tasks — {{ open().length }} open</h2>
+
+  <form class="tasks__add" (ngSubmit)="add()">
+    <input
+      class="tasks__field"
+      type="text"
+      placeholder="+ new task"
+      [(ngModel)]="draft"
+      name="draft"
+      autocomplete="off"
+    />
+    <input
+      class="tasks__due"
+      type="date"
+      [(ngModel)]="draftDue"
+      name="draftDue"
+      aria-label="due date"
+    />
+  </form>
+
+  <ul class="tasks__list">
+    @for (t of store.state().tasks; track t.id) {
+      <li class="tasks__item" [class.tasks__item--done]="t.done">
+        <button type="button" class="tasks__toggle" (click)="toggle(t.id)"
+                [attr.aria-label]="'toggle ' + t.text">
+          {{ t.done ? '[x]' : '[ ]' }}
+        </button>
+        <span class="tasks__text">{{ t.text }}</span>
+        @if (t.due) {
+          <span class="tasks__date" [class.tasks__date--urgent]="isUrgent(t)">{{ t.due }}</span>
+        }
+        <button type="button" class="tasks__remove" (click)="remove(t.id)"
+                [attr.aria-label]="'delete ' + t.text">×</button>
+      </li>
+    } @empty {
+      <li class="tasks__empty">no signal — add a task and the trace speeds up</li>
+    }
+  </ul>
+</section>

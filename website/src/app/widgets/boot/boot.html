@@ -1,0 +1,7 @@
+@if (!done()) {
+  <div class="boot" aria-hidden="true">
+    @for (line of shown(); track line) {
+      <p class="boot__line">{{ line }}</p>
+    }
+  </div>
+}

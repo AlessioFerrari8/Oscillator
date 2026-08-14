@@ -1,0 +1,22 @@
+<section class="panel"
+         [class.panel--acquiring]="weather.status() === 'acquiring'"
+         [class.panel--nosignal]="weather.status() === 'nosignal'">
+  <h2 class="panel__title">weather</h2>
+
+  @switch (weather.status()) {
+    @case ('ok') {
+      @if (weather.reading(); as r) {
+        <p class="weather__temp">{{ r.tempC }}°C</p>
+        <p class="weather__line">{{ describe(r.code) }}</p>
+        <p class="weather__line">wind {{ r.windKmh }} km/h</p>
+      }
+    }
+    @case ('acquiring') {
+      <p class="weather__line">acquiring…</p>
+    }
+    @default {
+      <p class="weather__line">no signal — {{ weather.reason() }}</p>
+      <button type="button" class="weather__retry" (click)="weather.retry()">retry</button>
+    }
+  }
+</section>
