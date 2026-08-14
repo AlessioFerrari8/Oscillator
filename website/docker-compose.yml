@@ -6,8 +6,9 @@ services:
     container_name: oscilla
     restart: unless-stopped
     ports:
-      # I use an high port, so it doesn't mess up with my other projects in the nest vps
-      - "${21080}:8080"
+      # Same port as `ng serve`, so the container and the dev server are reachable
+      # at the same address
+      - "4200:8080"
     security_opt:
       - no-new-privileges:true
     logging:
