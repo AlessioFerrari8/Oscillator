@@ -1,3 +1,415 @@
-/* You can add global styles to this file, and also import other style files */
-
 @import 'tailwindcss';
+
+
+/*
+Here are global styles.
+*/
+
+@font-face {
+  font-family: 'JetBrains Mono';
+  src: url('/fonts/JetBrainsMono-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'JetBrains Mono';
+  src: url('/fonts/JetBrainsMono-Bold.woff2') format('woff2');
+  font-weight: 700;
+  font-display: swap;
+}
+
+/* core color palett and shared layout values */
+:root {
+  --bg: #05070a;
+  --grid: #0d1a17;
+  --dim: #5c8478;
+  --accent: #6ee7a8;
+  --accent-soft: #6ee7a833;
+  --surface: color-mix(in srgb, var(--bg) 95%, var(--accent));
+  --frame: 2.5rem;
+}
+
+/* alternative accent themes selected through the data-accent attribute */
+:root[data-accent='p3'] {
+  --accent: #ffb454;
+  --accent-soft: #ffb45433;
+  --grid: #1d1508;
+  --dim: #977841;
+}
+
+/* cyan theme variant */
+:root[data-accent='cyan'] {
+  --accent: #58d7ff;
+  --accent-soft: #58d7ff33;
+  --grid: #08191f;
+  --dim: #47859a;
+}
+
+html {
+  background: var(--bg);
+}
+
+html, body {
+  margin: 0;
+  min-height: 100vh;
+  color: var(--accent);
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  position: relative;
+}
+
+/* full-screen technical grid used as the app background */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  background:
+    repeating-linear-gradient(to right,  var(--grid) 0 1px, transparent 1px 40px),
+    repeating-linear-gradient(to bottom, var(--grid) 0 1px, transparent 1px 40px);
+  pointer-events: none;
+}
+
+/* decorative signal-like frame shown along the right edge */
+body::after {
+  content: '';
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: var(--frame);
+  height: 100%;
+  z-index: -1;
+  background: linear-gradient(to bottom, var(--accent-soft), transparent 60%);
+  clip-path: polygon(
+    100% 0,   0 0,     100% 5%,  0 10%,   100% 15%, 0 20%,
+    100% 25%, 0 30%,   100% 35%, 0 40%,   100% 45%, 0 50%,
+    100% 55%, 0 60%,   100% 65%, 0 70%,   100% 75%, 0 80%,
+    100% 85%, 0 90%,   100% 95%, 0 100%,  100% 100%
+  );
+  pointer-events: none;
+}
+
+/* main layout container with consistent spacing and responsive padding */
+.oscilla-shell {
+  min-height: 100vh;
+  padding: var(--frame);
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* hosts the waveform/scope canvas behind the main interface */
+.scope-host {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* shared panel used by the dashboard widgets */
+.scope-canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.scope-status {
+  font-size: 0.75rem;
+  letter-spacing: 0.3em;
+  color: var(--dim);
+  text-transform: uppercase;
+}
+
+.panel {
+  border: 1px solid var(--grid);
+  background: var(--surface);
+  padding: 1rem;
+}
+.panel__title {
+  font-size: 0.7rem;
+  letter-spacing: 0.25em;
+  color: var(--dim);
+  text-transform: uppercase;
+  margin-bottom: 0.75rem;
+}
+
+/* visual states for panels that are acquiring data or have no signal */
+.panel--acquiring { animation: pulse-border 1.4s ease-in-out infinite; }
+.panel--nosignal  { border-color: color-mix(in srgb, var(--accent) 30%, transparent); }
+
+@keyframes pulse-border {
+  0%, 100% { border-color: var(--grid); }
+  50%      { border-color: var(--accent); }
+}
+
+:focus-visible {
+  outline: 1px solid var(--accent);
+  outline-offset: 2px;
+}
+
+@media (max-width: 600px) {
+  body::after { display: none; }
+  :root { --frame: 1rem; }
+}
+
+/* disable animated effects for users who prefer reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .panel--acquiring { animation: none; border-color: var(--accent); }
+}
+
+/* command-style search bar */
+.search {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  border-bottom: 1px solid var(--grid);
+  padding-bottom: 0.5rem;
+}
+.search__prompt { color: var(--dim); }
+.search__field {
+  flex: 1;
+  background: transparent;
+  border: 0;
+  color: var(--accent);
+  font: inherit;
+  font-size: 1.25rem;
+  outline: none;
+}
+.search__field::placeholder { color: var(--dim); }
+.search__engine {
+  appearance: none;
+  background: transparent;
+  border: 1px solid transparent;
+  padding: 0.15rem 0.4rem;
+  font: inherit;
+  font-size: 0.7rem;
+  letter-spacing: 0.2em;
+  color: var(--dim);
+  text-transform: uppercase;
+  cursor: pointer;
+  color-scheme: dark;
+}
+.search__engine:hover, .search__engine:focus-visible { border-color: var(--grid); color: var(--accent); }
+.search__override {
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+  color: var(--accent);
+  text-transform: uppercase;
+}
+
+/* full-screen command palette overlay */
+.palette {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  background: color-mix(in srgb, var(--bg) 75%, transparent);
+  display: flex;
+  justify-content: center;
+  padding-top: 12vh;
+}
+.palette__box {
+  width: min(34rem, 90vw);
+  border: 1px solid var(--accent);
+  background: var(--bg);
+  box-shadow: 0 0 30px var(--accent-soft);
+}
+.palette__field {
+  width: 100%;
+  padding: 0.9rem 1rem;
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid var(--grid);
+  color: var(--accent);
+  font: inherit;
+  outline: none;
+}
+
+/* scrollable list of matching commands */
+.palette__list { list-style: none; margin: 0; padding: 0; max-height: 50vh; overflow-y: auto; }
+.palette__item {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 0.6rem 1rem;
+  background: transparent;
+  border: 0;
+  color: var(--accent);
+  font: inherit;
+  cursor: pointer;
+}
+.palette__item:hover, .palette__item:focus-visible { background: var(--accent-soft); }
+.palette__empty { padding: 0.6rem 1rem; color: var(--dim); }
+
+/* task input and list styling */
+.tasks__add { margin-bottom: 0.75rem; display: flex; gap: 0.6rem; align-items: center; }
+.tasks__field {
+  flex: 0 1 24rem;
+  background: transparent;
+  border: 0;
+  border-bottom: 1px dashed var(--grid);
+  color: var(--accent);
+  font: inherit;
+  padding: 0.35rem 0;
+  outline: none;
+}
+.tasks__due {
+  color-scheme: dark;
+  background: transparent;
+  border: 0;
+  border-bottom: 1px dashed var(--grid);
+  color: var(--dim);
+  font: inherit;
+  font-size: 0.75rem;
+  padding: 0.35rem 0;
+  outline: none;
+}
+.tasks__due:hover, .tasks__due:focus { color: var(--accent); }
+.tasks__list { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.35rem; }
+.tasks__item { display: flex; align-items: center; gap: 0.6rem; }
+.tasks__item--done .tasks__text { color: var(--dim); text-decoration: line-through; }
+.tasks__toggle, .tasks__remove {
+  background: transparent; border: 0; color: var(--dim);
+  font: inherit; cursor: pointer; padding: 0;
+}
+.tasks__toggle:hover, .tasks__remove:hover { color: var(--accent); }
+.tasks__text { flex: 1; }
+.tasks__date { font-size: 0.7rem; color: var(--dim); letter-spacing: 0.1em; }
+.tasks__date--urgent { color: var(--accent); }
+.tasks__empty { color: var(--dim); }
+
+
+/* weather widget typography and status controls */
+.weather__temp { font-size: 2.5rem; line-height: 1; }
+.weather__line { color: var(--dim); font-size: 0.85rem; }
+.weather__retry {
+  margin-top: 0.5rem; background: transparent; border: 1px solid var(--grid);
+  color: var(--accent); font: inherit; padding: 0.25rem 0.75rem; cursor: pointer;
+}
+.weather__retry:hover { border-color: var(--accent); }
+
+/* quick links */
+.links__grid {
+  list-style: none; margin: 0; padding: 0;
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(7rem, 1fr)); gap: 0.5rem;
+}
+.links__cell { position: relative; }
+.links__link {
+  display: flex; align-items: center; gap: 0.5rem;
+  padding: 0.5rem; border: 1px solid transparent;
+  color: var(--accent); text-decoration: none; font-size: 0.85rem;
+}
+.links__link:hover { border-color: var(--grid); background: var(--accent-soft); }
+.links__icon { position: relative; width: 1rem; height: 1rem; display: grid; place-items: center; }
+.links__icon img { position: relative; z-index: 1; }
+.links__initial { position: absolute; inset: 0; display: grid; place-items: center; color: var(--dim); font-size: 0.7rem; }
+.links__label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.links__edit, .links__remove, .links__submit {
+  background: transparent; border: 0; color: var(--dim); font: inherit; cursor: pointer;
+}
+.links__edit { float: right; }
+.links__remove { position: absolute; top: 0; right: 0; }
+.links__add { display: flex; gap: 0.5rem; margin-top: 0.75rem; flex-wrap: wrap; }
+.links__field {
+  flex: 1; min-width: 8rem; background: transparent; border: 0;
+  border-bottom: 1px dashed var(--grid); color: var(--accent); font: inherit; outline: none;
+}
+.links__error { color: var(--dim); font-size: 0.75rem; margin-top: 0.5rem; }
+
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+.console {
+  display: grid;
+  gap: 0.9rem;
+  background: var(--surface);
+  border: 1px solid var(--grid);
+  padding: 1rem 1.25rem;
+}
+.console .search { border-bottom: 0; padding-bottom: 0; }
+.topbar__status { font-size: 0.7rem; letter-spacing: 0.25em; text-transform: uppercase; color: var(--dim); }
+.topbar__clock { font-size: 1.5rem; }
+
+/* responsive dashboard grid that adapts to available screen width */
+.grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+  align-items: start;
+}
+
+/* settings */
+.settings__row { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 0.6rem; }
+.settings__label { font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--dim); min-width: 5rem; }
+.settings__chip {
+  background: transparent; border: 1px solid var(--grid); color: var(--dim);
+  font: inherit; font-size: 0.75rem; padding: 0.2rem 0.6rem; cursor: pointer;
+}
+.settings__chip--on, .settings__chip:hover { border-color: var(--accent); color: var(--accent); }
+.settings { display: flex; flex-direction: column; }
+.settings__toggle { float: right; background: transparent; border: 0; color: var(--dim); font: inherit; cursor: pointer; }
+.settings__toggle:hover { color: var(--accent); }
+.settings__toggle--shut {
+  float: none;
+  align-self: flex-end;
+  font-size: 0.7rem;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  background: var(--surface);
+  border: 1px solid var(--grid);
+  padding: 0.3rem 0.7rem;
+}
+.settings__toggle--shut:hover { border-color: var(--accent); }
+.settings__field {
+  background: transparent; border: 0; border-bottom: 1px dashed var(--grid);
+  color: var(--accent); font: inherit; outline: none; width: 6rem;
+}
+.settings__area {
+  flex: 0 1 32rem; min-width: 12rem; background: transparent; border: 1px solid var(--grid);
+  color: var(--accent); font: inherit; font-size: 0.75rem; padding: 0.4rem; outline: none;
+}
+.settings__message { font-size: 0.75rem; color: var(--dim); }
+
+@media (max-width: 600px) {
+  .grid { grid-template-columns: 1fr; }
+}
+
+.boot {
+  position: fixed; inset: 0; z-index: 20;
+  background: var(--bg);
+  display: flex; flex-direction: column; justify-content: center;
+  padding: var(--frame);
+  animation: boot-out 0.25s ease-in 0.72s forwards;
+}
+.boot__line { font-size: 0.8rem; color: var(--dim); }
+@keyframes boot-out { to { opacity: 0; visibility: hidden; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .boot { display: none; }
+}
+
+/* drag and drop */
+.grid__cell { position: relative; }
+.grid__cell--dragging { opacity: 0.4; }
+.grid__grip {
+  position: absolute;
+  top: 0.35rem;
+  right: 0.5rem;
+  z-index: 2;
+  background: transparent;
+  border: 0;
+  color: var(--dim);
+  font: inherit;
+  line-height: 1;
+  cursor: grab;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+.grid__cell:hover .grid__grip,
+.grid__grip:focus-visible { opacity: 1; }
+.grid__grip:active { cursor: grabbing; }
+
+@media (prefers-reduced-motion: reduce) {
+  .grid__grip { transition: none; }
+}
